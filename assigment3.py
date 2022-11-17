@@ -52,8 +52,8 @@ class Hermite_cubic_spline(Polinome):
 		self.Z = Z
 
 
-		self.H0 = lambda x,xi,xi_1 : (pow((x-xi),2)/pow(hi,2))*(1+(2/hi)*x-xi_1)
-		self.H1 = lambda x,xi,xi_1 : (pow((x-xi_1),2)/pow(hi,2))*(1-(2/hi)*x-xi)
+		self.H0 = lambda x,xi,xi_1 : (pow((x-xi),2)/pow(hi,2))*(1+(2/hi)*(x-xi_1))
+		self.H1 = lambda x,xi,xi_1 : (pow((x-xi_1),2)/pow(hi,2))*(1-(2/hi)*(x-xi))
 		self.K0 = lambda x,xi,xi_1 : (pow((x-xi),2)/pow(hi,2))*(x-xi_1)
 		self.K1 = lambda x,xi,xi_1 : (pow((x-xi_1),2)/pow(hi,2))*(x-xi)
 	def __call__(self, x):
@@ -211,7 +211,7 @@ def do_exercise1():
 	print("We can observe that the for linear mapping the Runge's phenomenon appears, but for the nonlinear mapping it does not, so we must choose our interpolation point cleverly.")
 
 def plot(ax,f,a=0,b=1):
-	x_data = list(np.linspace(a, b, 100, endpoint=True))
+	x_data = list(np.linspace(a, b, 1000, endpoint=True))
 	y_data =[f(x) for x in x_data]
 	#ax.clear()
 	ax.plot(x_data,y_data)
@@ -229,19 +229,24 @@ def do_exercise2():
 	fig, ax = plt.subplots()
 
 	for i in range(6):
-		for t in np.linspace(0,1,100,endpoint=True):
+		for t in np.linspace(0,1,1000,endpoint=True):
 			ax.clear()
 			X = np.linspace(0,1,51,endpoint=True)
 			Y =[f_t(x,t) for x in X]
+			Z =[fder_t(x,t) for x in X]
+			
 			f = Linear(X,Y)
 			plot(ax,f)
 
-			#f = lambda x : f_t(x,t)
+			#f = Hermite_cubic_spline(1/50,X,Y,Z)
 			#plot(ax,f)
+
+			f = lambda x : f_t(x,t)
+			plot(ax,f)
 
 			ax.set_title(f"t = {t}")
 			# Note that using time.sleep does *not* work here!
-			plt.pause(0.1)
+			plt.pause(0.05)
 
 	plt.show()
 
@@ -256,8 +261,8 @@ def do_exercise2():
 
 print("assigment3")	
 
-do_exercise1()
-#do_exercise2()
+#do_exercise1()
+do_exercise2()
 
 plt.show()
 
