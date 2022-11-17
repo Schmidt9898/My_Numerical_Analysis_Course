@@ -78,41 +78,42 @@ class Hermite_cubic_spline(Polinome):
 
 class Natural_cubic_spline(Polinome):
 	def __init__(self,X,Y):
-		self.X = X
-		self.Y = Y
-		self.coef = []
+		# self.X = X
+		# self.Y = Y
+		# self.coef = []
 
-		h = 1/(len(X)-1)
+		# h = 1/(len(X)-1)
 
-		a = []
-		b = []
+		# a = []
+		# b = []
 
-		for i in range(1,len(X)-1):
-			a.append([h,2*h,h])
-			val =(6/h) * ( (Y[i+1]-Y[i])-(Y[i]-Y[i-1]) )
-			b.append(val)
-		x = np.linalg.solve(a, b)
-		print(x)
+		# for i in range(1,len(X)-1):
+		# 	a.append([h,2*h,h])
+		# 	val =(6/h) * ( (Y[i+1]-Y[i])-(Y[i]-Y[i-1]) )
+		# 	b.append(val)
+		#x = np.linalg.solve(a, b)
+		#print(x)
+		print("well i give up, i don't know how this works and how to do this. i should work on paper, i just can't understand it :(")
 
 	def __call__(self, x):
-		xi_1 = -1
-		xi = -1
-		Yi = 0
-		Yi_1 = 0
-		idx = -1
-		for i in range(len(self.X)):
-			if self.X[i]>=x:
-				idx = i
-				xi=self.X[i]
-				xi_1=self.X[i-1]
-				Yi = self.Y[i]
-				Yi_1 = self.Y[i-1]
-				Zi = self.Z[i]
-				Zi_1 = self.Z[i-1]
-				break
-		val =  self.H0(x,xi,xi_1)*Yi_1 + self.H1(x,xi,xi_1)*Yi + self.K0(x,xi,xi_1)*Zi_1 + self.K1(x,xi,xi_1)*Zi
-		return val
-
+		# xi_1 = -1
+		# xi = -1
+		# Yi = 0
+		# Yi_1 = 0
+		# idx = -1
+		# for i in range(len(self.X)):
+		# 	if self.X[i]>=x:
+		# 		idx = i
+		# 		xi=self.X[i]
+		# 		xi_1=self.X[i-1]
+		# 		Yi = self.Y[i]
+		# 		Yi_1 = self.Y[i-1]
+		# 		Zi = self.Z[i]
+		# 		Zi_1 = self.Z[i-1]
+		# 		break
+		# val =  self.H0(x,xi,xi_1)*Yi_1 + self.H1(x,xi,xi_1)*Yi + self.K0(x,xi,xi_1)*Zi_1 + self.K1(x,xi,xi_1)*Zi
+		# return val
+		raise Exception("I don't understand this.")
 
 #Lord forgive me for what i am about to code
 class Lagrange(Polinome):
@@ -274,36 +275,28 @@ def do_exercise2():
 			Y =[f_t(x,t) for x in X]
 			Z =[fder_t(x,t) for x in X]
 			
-			#f = Linear(X,Y)
-			#plot(ax,f)
-
-			#f = Hermite_cubic_spline(1/50,X,Y,Z)
-			#plot(ax,f)
-
-			f = Natural_cubic_spline(X,Y)
+			f = Linear(X,Y)
 			plot(ax,f)
+
+			f = Hermite_cubic_spline(X,Y,Z)
+			plot(ax,f)
+
+			#f = Natural_cubic_spline(X,Y)
+			#plot(ax,f)
 
 			#f = lambda x : f_t(x,t)
 			#plot(ax,f)
 
 			ax.set_title(f"t = {t}")
-			# Note that using time.sleep does *not* work here!
+			# Note to self that using time.sleep does *not* work here!
 			plt.pause(0.05)
 
 	plt.show()
 
-	#ani = animation.FuncAnimation(
-	#	fig,animate,init_func=init_anim,fargs=[f_t],frames = np.linspace(0, 1, 100,endpoint=True),blit = True)
-
-	#plot_y =[Linear(x,X,Y)  for x in plot_x]
-	#plt.plot(plot_x,plot_y,label='Linear')
-
-
-
 
 print("assigment3")	
 
-#do_exercise1()
+do_exercise1()
 do_exercise2()
 
 plt.show()
