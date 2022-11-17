@@ -261,7 +261,7 @@ def do_exercise2():
 
 print("assigment3")	
 
-#do_exercise1()
+do_exercise1()
 do_exercise2()
 
 plt.show()
