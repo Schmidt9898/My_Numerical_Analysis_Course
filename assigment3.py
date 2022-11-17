@@ -131,7 +131,7 @@ def do_exercise1():
 	samples = []
 	#2,4,6,....,24
 	for n in range(2,26,2):
-		X = list(np.linspace(-5, 5, n*2+1, endpoint=True))
+		X = list(np.linspace(-5, 5, n+1, endpoint=True))
 		Y =[f(x) for x in X]
 		pn = Lagrange(X,Y)
 
@@ -157,7 +157,7 @@ def do_exercise1():
 	print("solving b.")
 
 									#n+1 point
-	X = list(Chebyshev_space(-5, 5, 4+1)) #samples
+	X = list(Chebyshev_space(-5, 5, 10+1,False)) #samples
 	Y =[f(x) for x in X]
 	print("Samples:",Y)
 
@@ -187,7 +187,8 @@ def do_exercise1():
 	samples = []
 	#2,4,6,....,24
 	for n in range(2,26,2):
-		X = list(np.linspace(-5, 5, n*2+1, endpoint=True))
+		X = list(Chebyshev_space(-5, 5, n+1,endpoint=False)) #samples
+		#X = list(np.linspace(-5, 5, n+1, endpoint=True))
 		Y =[f(x) for x in X]
 		pn = Lagrange(X,Y)
 
@@ -207,8 +208,7 @@ def do_exercise1():
 	plt.xlabel("degree")
 	plt.show(block = False)
 
-	print("We can observe that the maximum error of this system does not change. We can see although that the Lagrange polynomial is in mean differ more from the original function in the non-equidistant way.")
-
+	print("We can observe that the for linear mapping the Runge's phenomenon appears, but for the nonlinear mapping it does not, so we must choose our interpolation point cleverly.")
 
 def plot(ax,f,a=0,b=1):
 	x_data = list(np.linspace(a, b, 100, endpoint=True))
@@ -224,6 +224,7 @@ def do_exercise2():
 	#plt.figure("Animation exercise 2")
 
 	f_t = lambda x,t : math.sin(5*math.pi*x)*math.cos(10*math.pi*t) + 2*math.sin(7*math.pi*x)*math.cos(14*math.pi*t)
+	fder_t = lambda x,t : math.pi*( 5*math.cos(10*math.pi*t)*math.cos(5*math.pi*x) + 14*math.cos(14*math.pi*t)*math.cos(7*math.pi*x) )
 
 	fig, ax = plt.subplots()
 
@@ -256,9 +257,9 @@ def do_exercise2():
 print("assigment3")	
 
 do_exercise1()
-do_exercise2()
+#do_exercise2()
 
-
+plt.show()
 
 
 
