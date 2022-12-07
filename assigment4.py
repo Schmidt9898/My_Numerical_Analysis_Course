@@ -9,7 +9,7 @@ def create_matrix(n):
 	#np.concatenate(([0],([-1]*(n-1))), axis=0)
 #	mat = np.matrix(mat)
 	mat = np.roll(np.diag(np.concatenate((([-1]*(n-1)), [0]), axis=0)),1)+ np.diag([2]*n) +np.roll(np.diag(np.concatenate(([0],([-1]*(n-1))), axis=0)),-1)
-	#mat = pow(n+1,2)*mat 
+	mat = pow(n+1,2)*mat 
 	print(mat)
 	return mat
 
@@ -78,13 +78,32 @@ def get_eigen_values(A0):
 	n = A0.shape[1]
 
 	A = A0
-	for i in range(2):
+	for i in range(200):
 		Q,R = QRdecomp(A)
 		Q_T = np.transpose(Q)
 		A = Q_T  * A * Q
 
-	print(A)
+	#print(A)
+	eigens = []
+	for i in range(A.shape[0]):
+		for j in range(A.shape[1]):
+			if i == j:
+				eigens.append(A[i,j])
+	return eigens
 
+def get_vector(A,Eigv):
+	n = A.shape[1]
+
+	w = np.asmatrix( [Eigv]*n )
+	w = np.transpose(w)
+	w = w/np.linalg.norm(w)
+
+	#(A - (Eigv*np.identity(n)) ) * v
+	for i in range(100):
+		w = (A - (Eigv * np.identity(n)) ) * w
+		w = w/np.linalg.norm(w)
+	
+	return np.asarray(w)
 
 #def QRdecomp(A):
 #	Q=R=A
@@ -127,10 +146,45 @@ A = create_matrix(n)
 res_eigen = get_eigen_values(A)
 
 
-gen_eig = lambda k,x : 4*pow(n+1,2)*pow(math.sin((k*math.pi)/(2*(n+1))),2)
+Eigv = max(res_eigen) # okay for some reason my solution works backward 
+print("Smallest eigen value:",Eigv)
 
 
-gen_eig(0,10)
+Eig_vector = get_vector(A,Eigv)
+
+
+
+gen_eig = lambda k,n : 4*pow(n+1,2)*pow(math.sin((k*math.pi)/(2*(n+1))),2)
+
+true_eigen = []
+for i in reversed(range(1,n+1)):
+	true_eigen.append(gen_eig(i,n))
+
+
+gen_eig_vector_val = lambda i,n : math.sin((math.pi*i)/(n+1))
+true_eigen_vector = []
+for i in range(1,n+1):
+	true_eigen_vector.append(gen_eig_vector_val(i,n))
+true_eigen_vector = np.asarray( true_eigen_vector ) / np.linalg.norm(true_eigen_vector)
+
+
+
+error = 0.0
+for i in range(n): 
+	error += math.pow(res_eigen[i]-true_eigen[i],1) 
+
+print("Eigen value error:",error)
+
+error = 0.0
+for i in range(n): 
+	error += math.pow(Eig_vector[i]-true_eigen_vector[i],1) 
+
+print("Eigen vector error:",error)
+
+
+
+quit()
+
 
 #Q,R = QRdecomp(A)
 #print(Q)
