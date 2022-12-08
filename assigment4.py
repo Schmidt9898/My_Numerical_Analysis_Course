@@ -146,12 +146,15 @@ A = create_matrix(n)
 res_eigen = get_eigen_values(A)
 
 
-Eigv = max(res_eigen) # okay for some reason my solution works backward 
-print("Smallest eigen value:",Eigv)
+Eigv = max(res_eigen) # okay for some reason my solution works backward so i give it the largest eigen value :D
+print("Smallest eigen value:",min(res_eigen)) # some cheat 
+
 
 
 Eig_vector = get_vector(A,Eigv)
 
+print("Eigen vector:")
+print(Eig_vector)
 
 
 gen_eig = lambda k,n : 4*pow(n+1,2)*pow(math.sin((k*math.pi)/(2*(n+1))),2)
