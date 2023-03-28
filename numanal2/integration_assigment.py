@@ -106,7 +106,7 @@ print("[a,b]",a,b)
 
 
 #############################################################
-#Exercise 1
+#Exercise 1-2
 #############################################################
 #Note to Mitya
 # Miért marad el az adaptív ennyire?
@@ -176,6 +176,12 @@ print("Equidistant","	Integrate: {} Error rate: {} Duration: {}s Intervals: {} O
 #############################################################################################
 #############################################################################################
 #############################################################################################
+#############################################################
+#Exercise 3-4
+#############################################################
+#Note: I tried to find parameters for every method to behave with similar error rate
+# therefore all method have similar error rates.
+
 print("------------------------------------------------------------------\n")
 
 print("Exercise 3-4:")
@@ -192,7 +198,7 @@ print("Adaptive","	Integrate: {} Error rate: {} Duration: {}s Intervals: {} Oper
 
 clear_count()
 start = time.time()
-val = equidistant(a,b,f,rule0,Gaussian_calc,1000)
+val = equidistant(a,b,f,rule0,Gaussian_calc,100)
 duration = time.time() - start
 print("Equidistant","	Integrate: {} Error rate: {} Duration: {}s Intervals: {} Operation: {}".format(val,Error_rate(val,true_value),duration,interval_count,operation_count))
 
@@ -200,16 +206,6 @@ print("------------------------------------------------------------------")
 
 quit()
 
-
-
-
-start = time.time()
-val = Gaussian_integrate(a,b,f,1000)
-duration = time.time() - start
-print(val," Gaussian",val - true_value,"duration",duration,"intervals:",interval_count,"operation:",operation_count)
-
-
-clear_count()
 
 
 
