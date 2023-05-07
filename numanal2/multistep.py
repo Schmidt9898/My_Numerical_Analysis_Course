@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import math
 import os
 
-# I tried to write all function so that thay can work with any dimension
+# I tried to write all function so that they can work with any number of dimension
 
-#Simple itaration from last assigment
+#Simple itaration from last semester assigment
 def simple_iteration(g,v,err=4,MAX_ITER=1000):
 	if err > 1:
 		err = pow(10,-err)
@@ -130,7 +130,7 @@ else:
 	print("Give it time, it is calculating...")
 	exact_sol = np.asarray(Adam_Smash(f,v,T,10**7))
 	np.save("./Lotka-Volterra.npy",exact_sol)
-	print("./Lotka-Volterra.npy hs been saved forfaster rerun :)")
+	print("./Lotka-Volterra.npy has been saved for faster rerun :)")
 plt_x_exact = np.linspace(0,T,exact_sol.shape[0])
 
 
@@ -140,11 +140,6 @@ last_peek_pos_t = plt_x_exact[peeks[-1]]
 last_peek_exact_value = np.interp(last_peek_pos_t, plt_x_exact, exact_sol[:,0]) #we use the X function
 print("last peek pos t:",last_peek_pos_t,"value",last_peek_exact_value)
 
-
-
-
-#solution_x = lambda x : np.interp(x, plt_x_exact, exact_sol[:,0])
-#solution_y = lambda x : np.interp(x, plt_x_exact, exact_sol[:,1])
 
 #Solver = Euler
 #Solver = reluE
@@ -167,8 +162,6 @@ for Solver in Solvers:
 	val = Solver(f,v,T,N)
 	val = np.asarray(val)
 	plt_x = np.linspace(0,T,val.shape[0])
-
-	#print("Calculated value at last peek:",np.interp(last_peek_pos_t, plt_x, val[:,0]))
 
 	estimate_peeks_x = find_peeks(val[:,0])
 	estimate_peeks_y = find_peeks(val[:,1])
@@ -197,7 +190,6 @@ for Solver in Solvers:
 	plt.plot(plt_x,val[:,1],label = "Estimated Y")
 	plt.legend()
 
-	#val2 = np.asarray(Euler(f,v,T,N))
 	plt.show(block = False)
 
 	print("Calculating error rate 2^10 -> 2^18")
