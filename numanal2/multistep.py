@@ -64,7 +64,7 @@ def Cranky_Nicolson(functions,v0,T,N):
 	return F
 
 # Adams-Bashford method
-def Adam_Smash(functions,v0,T,N):
+def Adam_Bash(functions,v0,T,N):
 	h = T/N
 	v = np.asarray(v0)
 	hf = 0.5 * h * np.asarray([f(v) for f in functions]) 
@@ -128,7 +128,7 @@ if os.path.exists("./Lotka-Volterra.npy"):
 	exact_sol = np.load("./Lotka-Volterra.npy")
 else:
 	print("Give it time, it is calculating...")
-	exact_sol = np.asarray(Adam_Smash(f,v,T,10**7))
+	exact_sol = np.asarray(Adam_Bash(f,v,T,10**7))
 	np.save("./Lotka-Volterra.npy",exact_sol)
 	print("./Lotka-Volterra.npy has been saved for faster rerun :)")
 plt_x_exact = np.linspace(0,T,exact_sol.shape[0])
@@ -144,12 +144,12 @@ print("last peek pos t:",last_peek_pos_t,"value",last_peek_exact_value)
 #Solver = Euler
 #Solver = reluE
 #Solver = Cranky_Nicolson
-#Solver = Adam_Smash
+#Solver = Adam_Bash
 
 Solvers = [	Euler,
 			reluE, 			 # backward euler and Crank Nicolson can be removed 
 			Cranky_Nicolson, # It was easy to write so i keept them here
-			Adam_Smash]
+			Adam_Bash]
 
 print("a,b,c,d",a,b,c,d)
 print("x0,y0",x0,y0)
