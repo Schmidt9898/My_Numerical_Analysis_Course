@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import math
 import os
 
+# I tried to write all function so that thay can work with any dimension
+
 #Simple itaration from last assigment
 def simple_iteration(g,v,err=4,MAX_ITER=1000):
 	if err > 1:
@@ -78,47 +80,35 @@ def Adam_Smash(functions,v0,T,N):
 		F.append(v2)
 	return F
 
-def find_peeks(array,N,window = 50):
+def find_peeks(array):
 	array = list(array)
 	pos_ = []
-	for n in range(N):
-		max_value = max(array)
-		max_index = array.index(max_value)
-		for i in range(max(max_index-window,0),min(max_index+window,len(array))):
-			array[i] = 0
-		pos_.append(max_index)
+	#for n in range(N):
+	#	max_value = max(array)
+	#	max_index = array.index(max_value)
+	#	for i in range(max(max_index-window,0),min(max_index+window,len(array))):
+	#		array[i] = 0
+	#	pos_.append(max_index)
+
+	last_val = array[0] 
+	is_down = False
+	for i,val in enumerate(array):
+		if is_down:
+			if last_val < val:
+				is_down = False
+			
+		else:
+			if last_val > val:
+				is_down = True 
+				pos_.append(i - 1)
+		last_val = val
 
 	return pos_
 	pass
 
 
-
-def Errornorm( u_e , u_h ):
-	u_h = np.asarray(u_h)
-	# ERRORNORM This function computes L2 error
-	# Computes an estimated distance between the
-	# exact solution and the numerical solution .
-	# The integral is approximated with three - point
-	# Gauss - Legendre quadrature rule
-	# u_e : Exact solution ( function )
-	# u_h : Numerical solution ( vector of nodal values )
-	n = len ( u_h ) # number of subintervals
-	h = 1.0 / ( n - 1) # length of subintervals
-	# rule for reference interval [0 , 1]
-	t = np.asarray([ (1 - math.sqrt (3/5)) / 2 , 1 / 2 , (1 + math.sqrt (3/5)) / 2 ])
-	w = np.asarray([ 5/18 , 8/18 , 5/18 ])
-	e2 = 0
-	for i  in range(0,n-1):
-		# evaluate at quadrature points
-		points = (i) * h + h * t
-		v_e = [u_e(x) for x in points]
-		v_h = (1 - t ) * u_h[i] + t * u_h[i+1]
-		# square difference and sum with weights
-		e2 += sum(np.power(v_e - v_h,2) * w)
-	return  math.sqrt ( h * abs( e2 ) )
-
-
 print("multistep.py")
+
 
 a,b,c,d = (1,1,1,1)
 x0 = 5.0
@@ -141,39 +131,93 @@ else:
 	exact_sol = np.asarray(Adam_Smash(f,v,T,10**7))
 	np.save("./Lotka-Volterra.npy",exact_sol)
 	print("./Lotka-Volterra.npy hs been saved forfaster rerun :)")
-plt_x_exact = np.linspace(0,50,exact_sol.shape[0])
+plt_x_exact = np.linspace(0,T,exact_sol.shape[0])
 
-print(find_peeks(exact_sol[:,0],6))
-#quit()
+
+peeks = find_peeks(exact_sol[:,0])
+print(peeks)
+last_peek_pos_t = plt_x_exact[peeks[-1]]
+last_peek_exact_value = np.interp(last_peek_pos_t, plt_x_exact, exact_sol[:,0]) #we use the X function
+print("last peek pos t:",last_peek_pos_t,"value",last_peek_exact_value)
+
+
 
 
 #solution_x = lambda x : np.interp(x, plt_x_exact, exact_sol[:,0])
 #solution_y = lambda x : np.interp(x, plt_x_exact, exact_sol[:,1])
 
-val = Euler(f,v,T,N)
-#val = reluE(f,v,T,N)
-#val = Cranky_Nicolson(f,v,T,N)
-#val = Adam_Smash(f,v,T,N)
-val = np.asarray(val)
-plt_x = np.linspace(0,50,val.shape[0])
+#Solver = Euler
+#Solver = reluE
+#Solver = Cranky_Nicolson
+#Solver = Adam_Smash
 
-#print([solution_x(x) for x in plt_x])
-#print([solution_y(x) for x in plt_x])
+Solvers = [	Euler,
+			reluE, 			 # backward euler and Crank Nicolson can be removed 
+			Cranky_Nicolson, # It was easy to write so i keept them here
+			Adam_Smash]
+
+print("a,b,c,d",a,b,c,d)
+print("x0,y0",x0,y0)
+print("T,N",T,N)
 
 
+for Solver in Solvers:
+	print("Solver is:",Solver.__name__)
 
-#print("X Error:",Errornorm( solution_x , val[:,0]))
-#print("Y Error:",Errornorm( solution_y , val[:,1]))
-#print(exact_sol.shape)
+	val = Solver(f,v,T,N)
+	val = np.asarray(val)
+	plt_x = np.linspace(0,T,val.shape[0])
 
-plt.figure("Lotka-Volterra")
-plt.plot(plt_x_exact,exact_sol[:,0])
-plt.plot(plt_x_exact,exact_sol[:,1])
+	#print("Calculated value at last peek:",np.interp(last_peek_pos_t, plt_x, val[:,0]))
 
-plt.plot(plt_x,val[:,0])
-plt.plot(plt_x,val[:,1])
+	estimate_peeks_x = find_peeks(val[:,0])
+	estimate_peeks_y = find_peeks(val[:,1])
 
-#val2 = np.asarray(Euler(f,v,T,N))
+
+	estimate_vals_at_peeks_x = [val[p,0] for p in estimate_peeks_x]
+	estimate_vals_at_peeks_y = [val[p,1] for p in estimate_peeks_y]
+
+	print(Solver.__name__,"Estimate peeks:",estimate_peeks_x )
+	print(Solver.__name__,"Estimate values:",estimate_vals_at_peeks_x )
+	print(Solver.__name__,"Estimate peeks:",estimate_peeks_y )
+	print(Solver.__name__,"Estimate values:",estimate_vals_at_peeks_y )
+
+
+	print("Max population of X:",max(estimate_vals_at_peeks_x))
+	print("Min population of X:",min(estimate_vals_at_peeks_x))
+	print("Max population of Y:",max(estimate_vals_at_peeks_y))
+	print("Min population of Y:",min(estimate_vals_at_peeks_y))
+
+
+	plt.figure("Lotka-Volterra with "+Solver.__name__)
+	plt.plot(plt_x_exact,exact_sol[:,0],label = "exact X")
+	plt.plot(plt_x_exact,exact_sol[:,1],label = "exact Y")
+
+	plt.plot(plt_x,val[:,0],label = "Estimated X")
+	plt.plot(plt_x,val[:,1],label = "Estimated Y")
+	plt.legend()
+
+	#val2 = np.asarray(Euler(f,v,T,N))
+	plt.show(block = False)
+
+	print("Calculating error rate 2^10 -> 2^18")
+
+	error_rate = []
+
+	for n in range(10,18):
+		val = Solver(f,v,T,2**n)
+		val = np.asarray(val)
+		plt_x = np.linspace(0,T,val.shape[0])
+		calculated_value = np.interp(last_peek_pos_t, plt_x, val[:,0])
+		error = ( calculated_value - last_peek_exact_value ) / last_peek_exact_value 
+		error_rate.append(error)
+
+	plt.figure("Error rate of "+Solver.__name__)
+	plt.plot(range(10,18),error_rate)
+
+	print(Solver.__name__,"Done.")
+	print("-"*100)
+
 
 
 plt.show()
