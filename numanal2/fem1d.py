@@ -88,10 +88,10 @@ def ApplyBoundary(A,b,b_left,b_right,h):
 
 
 def FEM_HeatEq_1D(Theta,M,N,c_f,f_f,ux0,a_,b_,t0,tm,bound_a,bound_b):
-	h = (b_ - a_) / N
-	k = (tm - t0) / M
 	n = N+1
 	m = M+1
+	h = (b_ - a_) / n
+	k = (tm - t0) / m
 	X = np.linspace(a_,b_,n,True)
 	T = np.linspace(t0,tm,m,True)
 
@@ -126,8 +126,12 @@ def FEM_HeatEq_1D(Theta,M,N,c_f,f_f,ux0,a_,b_,t0,tm,bound_a,bound_b):
 		btn = LoadVector(n, f)
 
 		y = np.transpose(np.asarray(y))
+
+		#A_hat = Mass + Theta * k * A
+		#M_term = Mass - (1 - Theta) * k * A
+		#b_hat = np.matmul(M_term , y + k * b)
 		A_hat = Mass + (1 - Theta)*Atn
-		b_hat = np.matmul((Mass - Theta*k*A),y) + k*(Theta*b+(1-Theta)*btn)
+		b_hat = np.matmul((Mass - (Theta)*k*A),y) + k*((Theta)*b+(1 - Theta)*btn)
 
 
 		A_hat, b_hat = ApplyBoundary(A_hat,b_hat,bound_a,bound_b,h)
@@ -178,51 +182,73 @@ cases =[
 		(0,10,200),
 		(0,200,10),]
 
-Theta,M,N = (0.5,10,10)#
+
+fig = plt.figure("Exercise 1")
+
+idx = 0
+for case in cases:
+	idx+=1
+	
+
+	Theta,M,N = case#
 
 
-a,b = 0,1
-t0,tm = 0,1
+	a,b = 0,1
+	t0,tm = 0,1
 
 
-bound_a = (0,BoundaryCondition.Dirichlet) #TODO
-bound_b = (0,BoundaryCondition.Dirichlet) #TODO
+	bound_a = (0,BoundaryCondition.Dirichlet) #TODO
+	bound_b = (0,BoundaryCondition.Dirichlet) #TODO
 
-ux0 = lambda x : math.sin(math.pi*x)
+	ux0 = lambda x : math.sin(math.pi*x)
 
-c = lambda x,t : 1 # 0 function # TODO
-f = lambda x,t : 0 #3*x*math.exp(-3*t) # 0 function # TODO
-
-
+	c = lambda x,t : 1 # 0 function # TODO
+	f = lambda x,t : 0 #3*x*math.exp(-3*t) # 0 function # TODO
 
 
 
-U = FEM_HeatEq_1D(Theta,M,N,c,f,ux0,a,b,t0,tm,bound_a,bound_b)
-
-n = N+1
-m = M+1
-
-U_exact = np.zeros((m,n))
-ue = lambda x,t : math.exp(-math.pi*math.pi*t) * math.sin(math.pi*x)
-
-ti = t0
-for t in range(m):
-	xi=a
-	for x in range(n):
-		U_exact[t,x] = ue(xi,ti)
-		xi+= 1/N
-	ti+= 1/M
-print(U_exact)
 
 
-X = np.linspace(a,b,n)
-plt.figure("e")
+	U = FEM_HeatEq_1D(Theta,M,N,c,f,ux0,a,b,t0,tm,bound_a,bound_b)
 
-plt.plot(X,U_exact[1],label = "Exact")
-plt.plot(X,U[1],label = "estimate")
-plt.legend()
+	n = N+1
+	m = M+1
+
+	U_exact = np.zeros((m,n))
+	ue = lambda x,t : math.exp(-math.pi*math.pi*t) * math.sin(math.pi*x)
+
+	ti = t0
+	for t in range(m):
+		xi=a
+		for x in range(n):
+			U_exact[t,x] = ue(xi,ti)
+			xi+= 1/N
+		ti+= 1/M
+	print(U_exact)
+
+	T = np.linspace(t0,tm,m,True)
+	X = np.linspace(a,b,n,True)
+
+
+
+	X, Y = np.meshgrid(X,T)
+
+	# Create a figure and axis
+	ax = fig.add_subplot(330+idx, projection='3d')
+	ax.set_title("Theta_{}_M_{}_N_{}".format(Theta,M,N))
+
+	# Plot the mesh using plot_trisurf
+	#axs[int(idx/3),idx%3]
+	ax.plot_surface(X,Y,U,label = "estimate")
+
+	#plt.legend()
+	
+fig = plt.figure("Exact solution.")
+ax = fig.add_subplot(111, projection='3d')
+ax.plot_surface(X, Y,U_exact,label = "Exact")
+
+
 plt.show()
-#plt.plot(X,ans)
 
 quit()
 
