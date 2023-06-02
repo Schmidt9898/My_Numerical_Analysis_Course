@@ -62,23 +62,23 @@ def StiffnessMatrix(N, c):
 	A[n,n] = trapazoid(c[n-1],c[n],h)
 	return A
 
-def ApplyBoundary(A,b,b_left,b_right,h):
+def ApplyBoundary(A,b,b_left,b_right,t):
 	
 	#applying left side
 	val,type=b_left
 	if type == BoundaryCondition.Neumann:
-		b[0] -= val
+		b[0] -= val(t)
 	else: #BoundaryCondition.Dirichlet
-		b[0] = val
+		b[0] = val(t)
 		A[0,0] = 1
 		A[0,1] = 0
 
 	#applying right side
 	val,type=b_right
 	if type == BoundaryCondition.Neumann:
-		b[-1] += val
+		b[-1] += val(t)
 	else: #BoundaryCondition.Dirichlet
-		b[-1] = val
+		b[-1] = val(t)
 		A[-1,-1] = 1
 		A[-1,-2] = 0
 	
@@ -134,7 +134,7 @@ def FEM_HeatEq_1D(Theta,M,N,c_f,f_f,ux0,a_,b_,t0,tm,bound_a,bound_b):
 		b_hat = np.matmul((Mass - (Theta)*k*A),y) + k*((Theta)*b+(1 - Theta)*btn)
 
 
-		A_hat, b_hat = ApplyBoundary(A_hat,b_hat,bound_a,bound_b,h)
+		A_hat, b_hat = ApplyBoundary(A_hat,b_hat,bound_a,bound_b,t)
 
 
 
@@ -170,6 +170,8 @@ def ApplyIC(g,X):
 	return y
 
 
+#task 1
+
 		#Theta,M,N
 cases =[
 		(1,10,10),
@@ -197,8 +199,8 @@ for case in cases:
 	t0,tm = 0,1
 
 
-	bound_a = (0,BoundaryCondition.Dirichlet) #TODO
-	bound_b = (0,BoundaryCondition.Dirichlet) #TODO
+	bound_a = (lambda t : 0,BoundaryCondition.Dirichlet) #TODO
+	bound_b = (lambda t : 0,BoundaryCondition.Dirichlet) #TODO
 
 	ux0 = lambda x : math.sin(math.pi*x)
 
@@ -243,13 +245,85 @@ for case in cases:
 
 	#plt.legend()
 	
-fig = plt.figure("Exact solution.")
+fig = plt.figure("Task 1 Exact solution.")
 ax = fig.add_subplot(111, projection='3d')
 ax.plot_surface(X, Y,U_exact,label = "Exact")
 
 
-plt.show()
+#plt.show()
+#task 2
 
+
+fig = plt.figure("Exercise 2")
+
+idx = 0
+for case in cases:
+	idx+=1
+	
+
+	Theta,M,N = case#
+
+
+	a,b = 0,1
+	t0,tm = 0,1
+
+
+
+
+	bound_a = (lambda t : 0,BoundaryCondition.Dirichlet) #TODO
+	bound_b = (lambda t : 1-math.exp(-3*t),BoundaryCondition.Neumann) #TODO
+
+	ux0 = lambda x : 0
+
+	c = lambda x,t : 1 # 0 function # TODO
+	f = lambda x,t : 3*x*math.exp(-3*t) # 0 function # TODO
+
+
+
+
+
+	U = FEM_HeatEq_1D(Theta,M,N,c,f,ux0,a,b,t0,tm,bound_a,bound_b)
+
+	n = N+1
+	m = M+1
+
+	U_exact = np.zeros((m,n))
+	ue = lambda x,t : x*(1 - math.exp(-3*t))
+
+	ti = t0
+	for t in range(m):
+		xi=a
+		for x in range(n):
+			U_exact[t,x] = ue(xi,ti)
+			xi+= 1/N
+		ti+= 1/M
+	print(U_exact)
+
+	T = np.linspace(t0,tm,m,True)
+	X = np.linspace(a,b,n,True)
+
+
+
+	X, Y = np.meshgrid(X,T)
+
+	# Create a figure and axis
+	ax = fig.add_subplot(330+idx, projection='3d')
+	ax.set_title("Theta_{}_M_{}_N_{}".format(Theta,M,N))
+
+	# Plot the mesh using plot_trisurf
+	#axs[int(idx/3),idx%3]
+	ax.plot_surface(X,Y,U,label = "estimate")
+
+	#plt.legend()
+	
+fig = plt.figure("Task 2 Exact solution.")
+ax = fig.add_subplot(111, projection='3d')
+ax.plot_surface(X, Y,U_exact,label = "Exact")
+
+
+
+
+plt.show()
 quit()
 
 
